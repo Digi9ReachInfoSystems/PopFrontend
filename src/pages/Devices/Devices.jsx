@@ -99,6 +99,16 @@ const [selectedImage, setSelectedImage] = useState(null);
       render: (text) => <span>{text}</span>,
     },
     {
+      title:"Base Url",
+      dataIndex: "base_url",
+      key: "base_url",
+    },
+    {
+      title:"Printer name",
+      dataIndex: "printer_name",
+      key: "printer_name",
+    },
+    {
       title: "Device Key",
       dataIndex: "device_key",
       key: "device_key",
