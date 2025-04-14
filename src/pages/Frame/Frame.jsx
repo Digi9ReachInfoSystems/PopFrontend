@@ -45,6 +45,7 @@ const Frame = () => {
     setLoading(true);
     try {
       const response = await getAllFrames();
+      console.log('Frames:', response);
       setFrames(response.frames || []);
     } catch (error) {
       console.error('Error fetching frames:', error);
@@ -85,6 +86,9 @@ const Frame = () => {
       title: "Overlay",
       dataIndex: "overlay",
       key: "overlay",
+      render: (bg) => {
+        return bg ? "Yes" : "No";
+      }
     },
     {
       title: 'Orientation',
@@ -120,6 +124,22 @@ const Frame = () => {
       title: 'No. of Photos',
       dataIndex: 'no_of_photos',
       key: 'no_of_photos'
+    },
+    {
+      title:'Is 4 by 6',
+      dataIndex: 'is4by6',
+      key: 'is4by6',
+      render: (bg) => {
+        return bg ? "Yes" : "No";
+      }
+    },
+    {
+      title:'Is 2 by 6',
+      dataIndex: 'is2by6',
+      key: 'is2by6',
+      render: (bg) => {
+        return bg ? "Yes" : "No";
+      }
     },
     {
       title: 'Background',
@@ -212,6 +232,8 @@ const Frame = () => {
       background: backgroundStr,
       topPadding: frame.topPadding, 
       bottomPadding: frame.bottomPadding, 
+      is4by6: frame.is4by6,
+      is2by6: frame.is2by6
     });
   };
 
@@ -226,7 +248,6 @@ const Frame = () => {
       ? values.background.split(',').map(item => item.trim()).filter(url => url)
       : [];
 
-    // Build the update payload with all fields.
     const updatePayload = {
       frame_size: values.frame_size,
       price: values.price,
@@ -244,6 +265,8 @@ const Frame = () => {
       no_of_photos: values.no_of_photos,
       image: values.image,
       background: backgroundArray,
+      is4by6: values.is4by6,
+      is2by6: values.is2by6
     };
 
     try {
@@ -542,6 +565,30 @@ const Frame = () => {
     </Form.Item>
 
     <Form.Item
+    name="is4by6"
+    label="Is this frame 4 by 6?"
+    rules={[{ required: true, message: 'Please select 4 by 6 option!' }]}
+    >
+      <Select>
+        <Select.Option value="yes">Yes</Select.Option>
+        <Select.Option value="no">No</Select.Option>
+      </Select>
+      
+    </Form.Item>
+
+    <Form.Item
+    name="is2by6"
+    label="Is this frame 2 by 6?"
+    rules={[{ required: true, message: 'Please select 2 by 6 option!'
+      }]}
+      >
+        <Select>
+          <Select.Option value="yes">Yes</Select.Option>
+          <Select.Option value="no">No</Select.Option>
+        </Select>
+      </Form.Item>
+
+    <Form.Item
       name="index"
       label="Index"
       rules={[{ required: true, message: 'Please enter frame index!' }]}
@@ -737,6 +784,29 @@ const Frame = () => {
           </Form.Item>
 
 
+          <Form.Item
+    name="is4by6"
+    label="Is this frame 4 by 6?"
+    rules={[{ required: true, message: 'Please select 4 by 6 option!' }]}
+    >
+      <Select>
+        <Select.Option value="yes">Yes</Select.Option>
+        <Select.Option value="no">No</Select.Option>
+      </Select>
+      
+    </Form.Item>
+
+    <Form.Item
+    name="is2by6"
+    label="Is this frame 2 by 6?"
+    rules={[{ required: true, message: 'Please select 2 by 6 option!'
+      }]}
+      >
+        <Select>
+          <Select.Option value="yes">Yes</Select.Option>
+          <Select.Option value="no">No</Select.Option>
+        </Select>
+      </Form.Item>
           <Form.Item
             name="index"
             label="Index"
