@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Table, Spin, message, Button, Popconfirm, Modal, Input, Upload, Empty } from "antd";
+import { Table, Typography,Spin, message, Button, Popconfirm, Modal, Input, Upload, Empty } from "antd";
 import { getDevices, updateDevice, deleteDevice } from "../../api/backgroundApi";
 import { DevicesWrapper, DevicesContent } from "./Devices.styles";
 import { UploadOutlined } from '@ant-design/icons';
-
+const {Title} = Typography;
 const Devices = () => {
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -13,7 +13,8 @@ const Devices = () => {
   const [searchText, setSearchText] = useState("");
   const [filteredDevices, setFilteredDevices] = useState([]);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
-const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [newNoOfRolls, setNewNoOfRolls] = useState(null); // State for no_of_rolls
 
   const fetchDevices = async () => {
     setLoading(true);
@@ -35,6 +36,8 @@ const [selectedImage, setSelectedImage] = useState(null);
 
   const handleEdit = (device) => {
     setEditingDevice(device);
+    setNewImage(null); // Reset the new image state when editing a device
+    setNewNoOfRolls(device.no_of_rolls); // Set the current number of rolls when editing
     setIsModalVisible(true);
   };
 
@@ -49,14 +52,20 @@ const [selectedImage, setSelectedImage] = useState(null);
   };
 
   const handleUpdate = async () => {
-    if (!newImage) {
-      message.error("Please upload an image to update");
+    if (!newImage && newNoOfRolls === null) {
+      message.error("Please upload an image or update the number of rolls.");
       return;
     }
 
     const formData = new FormData();
     formData.append("device_key", editingDevice.device_key);
-    formData.append("background_image", newImage);
+
+    if (newImage) {
+      formData.append("background_image", newImage);
+    }
+    if (newNoOfRolls !== null) {
+      formData.append("no_of_rolls", newNoOfRolls);
+    }
 
     try {
       const response = await updateDevice(formData);
@@ -64,7 +73,7 @@ const [selectedImage, setSelectedImage] = useState(null);
       fetchDevices();
       setIsModalVisible(false);
     } catch (error) {
-      message.error("Failed to update background image");
+      message.error("Failed to update device");
     }
   };
 
@@ -75,13 +84,13 @@ const [selectedImage, setSelectedImage] = useState(null);
       setFilteredDevices(devices); 
       return;
     }
-  
+
     const filtered = devices.filter(device => {
       const name = device?.device_name?.toLowerCase() || "";
       const area = device?.device_area?.toLowerCase() || "";
       return name.includes(value.toLowerCase()) || area.includes(value.toLowerCase());
     });
-  
+
     setFilteredDevices(filtered);
   };
 
@@ -89,7 +98,6 @@ const [selectedImage, setSelectedImage] = useState(null);
     setSelectedImage(imageUrl);
     setIsImageModalVisible(true);
   };
-  
 
   const columns = [
     {
@@ -114,29 +122,32 @@ const [selectedImage, setSelectedImage] = useState(null);
       key: "device_key",
     },
     {
-        title: "Device Location",
-        dataIndex: "device_location",
-        key: "device_location",
-        render: (deviceLocation) => {
-          const { Country, state, City } = deviceLocation || {};
-          return `${Country || 'N/A'}, ${state || 'N/A'}, ${City || 'N/A'}`;
-        },
+      title: "Device Location",
+      dataIndex: "device_location",
+      key: "device_location",
+      render: (deviceLocation) => {
+        const { Country, state, City } = deviceLocation || {};
+        return `${Country || 'N/A'}, ${state || 'N/A'}, ${City || 'N/A'}`;
       },
-      
-   
+    },
     {
-        title: "Background Image",
-        dataIndex: "background_image",
-        key: "background_image",
-        render: (url) => (
-          <img
-            src={url}
-            alt="Background"
-            style={{ width: 100, height: 100, cursor: "pointer" }}
-            onClick={() => handleImageClick(url)}
-          />
-        ),
-      },
+      title:"Remaining rolls",
+      dataIndex: "no_of_rolls",
+      key: "no_of_rolls",
+    },
+    {
+      title: "Background Image",
+      dataIndex: "background_image",
+      key: "background_image",
+      render: (url) => (
+        <img
+          src={url}
+          alt="Background"
+          style={{ width: 100, height: 100, cursor: "pointer" }}
+          onClick={() => handleImageClick(url)}
+        />
+      ),
+    },
     {
       title: "Actions",
       key: "actions",
@@ -158,9 +169,18 @@ const [selectedImage, setSelectedImage] = useState(null);
   return (
     <div>
       <DevicesWrapper>
-        {/* <DevicesContent>Registered Devices</DevicesContent> */}
-
-        <div style={{ marginBottom: 16 }}>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        marginBottom: '16px' 
+      }}>
+        <Title level={2} style={{ 
+          fontSize: '1.5rem', 
+          margin: 20 
+        }}>
+          Devices
+        </Title>   
           <Input 
             placeholder="Search by Device Name or Area"
             value={searchText}
@@ -181,34 +201,47 @@ const [selectedImage, setSelectedImage] = useState(null);
           />
         )}
       </DevicesWrapper>
-    
-      <Modal
-      title="View Background Image"
-      visible={isImageModalVisible}
-      footer={null}
-      onCancel={() => setIsImageModalVisible(false)}
-    >
-      {selectedImage && (
-        <img src={selectedImage} alt="Selected" style={{ width: "100%" }} />
-      )}
-    </Modal>
 
       <Modal
-        title="Edit Background Image"
+        title="View Background Image"
+        visible={isImageModalVisible}
+        footer={null}
+        onCancel={() => setIsImageModalVisible(false)}
+      >
+        {selectedImage && (
+          <img src={selectedImage} alt="Selected" style={{ width: "100%" }} />
+        )}
+      </Modal>
+
+      <Modal
+        title="Edit Device"
         visible={isModalVisible}
         onOk={handleUpdate}
         onCancel={() => setIsModalVisible(false)}
       >
         <div>
           <h3>Current Device: {editingDevice?.device_name}</h3>
-          <Upload
-            beforeUpload={(file) => {
-              setNewImage(file); 
-              return false; 
-            }}
-          >
-            <Button icon={<UploadOutlined />}>Select Image</Button>
-          </Upload>
+
+          <div style={{ marginBottom: 16 }}>
+            <label>No of Rolls:</label>
+            <Input
+              type="number"
+              value={newNoOfRolls}
+              onChange={(e) => setNewNoOfRolls(e.target.value)}
+              style={{ width: "100%" }}
+            />
+          </div>
+
+          <div style={{ marginBottom: 16 }}>
+            <Upload
+              beforeUpload={(file) => {
+                setNewImage(file); 
+                return false; 
+              }}
+            >
+              <Button icon={<UploadOutlined />}>Select Image</Button>
+            </Upload>
+          </div>
         </div>
       </Modal>
     </div>

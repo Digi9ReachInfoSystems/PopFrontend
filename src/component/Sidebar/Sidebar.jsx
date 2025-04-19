@@ -5,6 +5,9 @@ import { FaUsers, FaLaptop, FaCopy, FaImage } from "react-icons/fa";
 import { RiMoneyRupeeCircleFill } from "react-icons/ri";
 import { MdDashboard } from "react-icons/md";
 import { IoHomeSharp } from "react-icons/io5";
+import { SiStagetimer } from "react-icons/si";
+import { IoIosImages } from "react-icons/io";
+import { RiCoupon2Fill } from "react-icons/ri";
 import Logo2 from "../../assets/logo.png";
 
 const Sidebar = ({ setTitle, isCollapsed, setIsCollapsed }) => {
@@ -16,7 +19,9 @@ const Sidebar = ({ setTitle, isCollapsed, setIsCollapsed }) => {
     { id: 5, name: "Copies", path: "/admin/copy", icon: <FaCopy /> },
     { id: 6, name: "Frames", path: "/admin/frame", icon: <FaImage /> },
     { id: 7, name: "Payment", path: "/admin/payment", icon: <RiMoneyRupeeCircleFill /> },
-    { id: 8, name: "Coupons", path: "/admin/coupon", icon: <FaUsers /> },
+    { id: 8, name: "Coupons", path: "/admin/coupon", icon: <RiCoupon2Fill /> },
+    {id: 9, name: "Frame images", path: "/admin/frame-image", icon: <IoIosImages /> },
+    {id: 10, name: "Page timer", path: "/admin/pageTimer", icon: <SiStagetimer  /> },
   ];
 
   return (

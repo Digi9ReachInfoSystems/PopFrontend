@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { CopyWrapper, CopyContent } from './Copy.style';
 import { getCopies, deleteCopy } from "../../api/copiesApi";
 import { createCopy } from "../../api/copiesApi";
-import { Table, Spin, Button, Modal, Form, Input, Popconfirm, message } from 'antd';
+import { Table, Typography,Spin, Button, Modal, Form, Input, Popconfirm, message } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
-
+const { Title } = Typography;
 const Copy = () => {
     const [copies, setCopies] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -115,8 +115,18 @@ const Copy = () => {
     return (
         <CopyWrapper>
             {/* Create Copy Button */}
-            <div style={{ textAlign: "right", marginBottom: 16 }}>
-                <Button type="primary" onClick={showModal}>
+            <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        marginBottom: '16px' 
+      }}>
+        <Title level={2} style={{ 
+          fontSize: '1.5rem', 
+          margin: 20 
+        }}>
+          Copies
+        </Title>    <Button type="primary" onClick={showModal}>
                     Create Copy
                 </Button>
             </div>

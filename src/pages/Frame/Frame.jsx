@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { FaqWrapper, FaqContent } from './Frame.style';
-import { Table, Spin, Modal, Button, Form, Input, message, Image, Select } from 'antd';
+import { Table, Spin, Typography, Modal, Button, Form, Input, message, Image, Select } from 'antd';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique filenames
 import { MdDelete } from "react-icons/md";
 // Firebase imports
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../config/firebaseConfig';
+const { Title } = Typography;
 
 import {
   getAllFrames,
@@ -41,6 +42,7 @@ const Frame = () => {
   const [editForm] = Form.useForm();
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [isBackgroundLoading, setIsBackgroundLoading] = useState(false);
+
   const fetchFrames = async () => {
     setLoading(true);
     try {
@@ -125,8 +127,87 @@ const Frame = () => {
       dataIndex: 'no_of_photos',
       key: 'no_of_photos'
     },
+
+    // {
+    //   title: "One",
+    //   dataIndex: 'one',
+    //   key: 'one',
+    //   render: (bg) => {
+    //     return bg ? "Yes" : "No";
+    //   }
+    // },
+    // {
+    //   title: "Two",
+    //   dataIndex: 'two',
+    //   key: 'two',
+    //   render: (bg) => {
+    //     return bg ? "Yes" : "No";
+    //   }
+    // },
+    // {
+    //   title: "Three",
+    //   dataIndex: 'three',
+    //   key: 'three',
+    //   render: (bg) => {
+    //     return bg ? "Yes" : "No";
+    //   }
+    // },
+    // {
+    //   title: "Four",
+    //   dataIndex: 'four',
+    //   key: 'four',
+    //   render: (bg) => {
+    //     return bg ? "Yes" : "No";
+    //   }
+    // },
+    // {
+
+    //   title: "Five",
+    //   dataIndex: 'five',
+    //   key: 'five',
+    //   render: (bg) => {
+    //     return bg ? "Yes" : "No";
+    //   }
+    // },
+    // {
+    //   title: "Six",
+    //   dataIndex: 'six',
+    //   key: 'six',
+    //   render: (bg) => {
+    //     return bg ? "Yes" : "No";
+    //   }
+    // },
+    // {
+    //   title: "Seven",
+    //   dataIndex: 'seven',
+    //   key: 'seven',
+    //   render: (bg) => {
+    //     return bg ? "Yes" : "No";
+    //   }
+    // },
+
     {
-      title:'Is 4 by 6',
+      title: "Selected Photos",
+      key: "selectedPhotos",
+      render: (_, record) => {
+        // you could also store that number in record.photoSelectionId or so,
+        // but if you're relying on those boolean fields:
+        const flags = [
+          record.one,
+          record.two,
+          record.three,
+          record.four,
+          record.five,
+          record.six,
+          record.seven,
+        ];
+        const idx = flags.findIndex((f) => f);
+        // idx will be 0..6 or -1 if none
+        return idx >= 0 ? String(idx + 1) : "N/A";
+      }
+    },    
+    {
+      title: 'Is 4 by 6',
       dataIndex: 'is4by6',
       key: 'is4by6',
       render: (bg) => {
@@ -134,7 +215,7 @@ const Frame = () => {
       }
     },
     {
-      title:'Is 2 by 6',
+      title: 'Is 2 by 6',
       dataIndex: 'is2by6',
       key: 'is2by6',
       render: (bg) => {
@@ -230,10 +311,17 @@ const Frame = () => {
       shapes: frame.shapes,
       overlay: frame.overlay,
       background: backgroundStr,
-      topPadding: frame.topPadding, 
-      bottomPadding: frame.bottomPadding, 
+      topPadding: frame.topPadding,
+      bottomPadding: frame.bottomPadding,
       is4by6: frame.is4by6,
-      is2by6: frame.is2by6
+      is2by6: frame.is2by6,
+      one: frame.one,
+      two: frame.two,
+      three: frame.three,
+      four: frame.four,
+      five: frame.five,
+      six: frame.six,
+      seven: frame.seven,
     });
   };
 
@@ -266,7 +354,14 @@ const Frame = () => {
       image: values.image,
       background: backgroundArray,
       is4by6: values.is4by6,
-      is2by6: values.is2by6
+      is2by6: values.is2by6,
+      one: values.one,
+      two: values.two,
+      three: values.three,
+      four: values.four,
+      five: values.five,
+      six: values.six,
+      seven: values.seven,
     };
 
     try {
@@ -284,8 +379,8 @@ const Frame = () => {
     }
   };
 
-  
-  
+
+
   // ========== DELETE FRAME ==========
   const handleDelete = async (id) => {
     if (!id) {
@@ -480,7 +575,14 @@ const Frame = () => {
 
   return (
     <FaqWrapper>
-      <FaqContent style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+       <FaqContent style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+       <Title level={2} style={{ 
+          fontSize: '1.5rem', 
+          margin: 20 
+        }}>
+          Frames
+        </Title>   
+     
         <Button type="primary" onClick={() => setIsCreateModalVisible(true)}>
           Create Frame
         </Button>
@@ -489,7 +591,9 @@ const Frame = () => {
       {loading ? (
         <Spin size="large" />
       ) : (
-        <Table dataSource={frames} columns={columns} rowKey="_id" />
+        <Table dataSource={frames} columns={columns} rowKey="_id"
+          scroll={{ x: 'max-content' }}  // This enables horizontal scrolling
+        />
       )}
 
       {/* Image Preview Modal */}
@@ -502,224 +606,289 @@ const Frame = () => {
         <img src={selectedImage} alt="Preview" style={{ width: '100%' }} />
       </Modal>
 
-     <Modal
-  visible={isEditing}
-  title="Edit Frame"
-  onCancel={() => setIsEditing(false)}
-  footer={null}
->
-  <Form
-    form={editForm}
-    onFinish={handleUpdate}
-    layout="vertical"
-  >
-    <Form.Item
-      name="frame_size"
-      label="Frame Size"
-      rules={[{ required: true, message: 'Please enter frame size!' }]}
-    >
-      <Input />
-    </Form.Item>
-
-    <Form.Item
-      name="price"
-      label="Frame Price"
-      rules={[{ required: true, message: 'Please enter frame price!' }]}
-    >
-      <Input />
-    </Form.Item>
-
-    <Form.Item
-      name="rows"
-      label="Rows"
-      rules={[{ required: true, message: 'Please enter frame rows!' }]}
-    >
-      <Input />
-    </Form.Item>
-
-    <Form.Item
-      name="columns"
-      label="Columns"
-      rules={[{ required: true, message: 'Please enter frame columns!' }]}
-    >
-      <Input />
-    </Form.Item>
-
-    <Form.Item
-      name="orientation"
-      label="Orientation"
-      rules={[{ required: true, message: 'Please enter frame orientation!' }]}
-    >
-      <Input />
-    </Form.Item>
-
-    <Form.Item
-      name="overlay"
-      label="Is this frame overlay?"
-      rules={[{ required: true, message: 'Please select overlay option!' }]}
-    >
-      <Select>
-        <Select.Option value="yes">Yes</Select.Option>
-        <Select.Option value="no">No</Select.Option>
-      </Select>
-    </Form.Item>
-
-    <Form.Item
-    name="is4by6"
-    label="Is this frame 4 by 6?"
-    rules={[{ required: true, message: 'Please select 4 by 6 option!' }]}
-    >
-      <Select>
-        <Select.Option value="yes">Yes</Select.Option>
-        <Select.Option value="no">No</Select.Option>
-      </Select>
-      
-    </Form.Item>
-
-    <Form.Item
-    name="is2by6"
-    label="Is this frame 2 by 6?"
-    rules={[{ required: true, message: 'Please select 2 by 6 option!'
-      }]}
+      <Modal
+        visible={isEditing}
+        title="Edit Frame"
+        onCancel={() => setIsEditing(false)}
+        footer={null}
       >
-        <Select>
-          <Select.Option value="yes">Yes</Select.Option>
-          <Select.Option value="no">No</Select.Option>
-        </Select>
-      </Form.Item>
+        <Form
+          form={editForm}
+          onFinish={handleUpdate}
+          layout="vertical"
+        >
+          <Form.Item
+            name="frame_size"
+            label="Frame Size"
+            rules={[{ required: true, message: 'Please enter frame size!' }]}
+          >
+            <Input />
+          </Form.Item>
 
-    <Form.Item
-      name="index"
-      label="Index"
-      rules={[{ required: true, message: 'Please enter frame index!' }]}
-    >
-      <Input />
-    </Form.Item>
+          <Form.Item
+            name="price"
+            label="Frame Price"
+            rules={[{ required: true, message: 'Please enter frame price!' }]}
+          >
+            <Input />
+          </Form.Item>
 
-    <Form.Item
-      name="padding"
-      label="Padding"
-      rules={[{ required: true, message: 'Please enter frame padding!' }]}
-    >
-      <Input />
-    </Form.Item>
+          <Form.Item
+            name="rows"
+            label="Rows"
+            rules={[{ required: true, message: 'Please enter frame rows!' }]}
+          >
+            <Input />
+          </Form.Item>
 
-    <Form.Item
-      name="topPadding"
-      label="Top Padding"
-      rules={[{ required: true, message: 'Please enter top padding!' }]}
-    >
-      <Input />
-    </Form.Item>
+          <Form.Item
+            name="columns"
+            label="Columns"
+            rules={[{ required: true, message: 'Please enter frame columns!' }]}
+          >
+            <Input />
+          </Form.Item>
 
-    <Form.Item
-      name="bottomPadding"
-      label="Bottom Padding"
-      rules={[{ required: true, message: 'Please enter bottom padding!' }]}
-    >
-      <Input />
-    </Form.Item>
+          <Form.Item
+            name="orientation"
+            label="Orientation"
+            rules={[{ required: true, message: 'Please enter frame orientation!' }]}
+          >
+            <Input />
+          </Form.Item>
 
-    <Form.Item
-      name="horizontal_gap"
-      label="Horizontal Gap"
-      rules={[{ required: true, message: 'Please enter frame horizontal gap!' }]}
-    >
-      <Input />
-    </Form.Item>
+          <Form.Item
+            name="overlay"
+            label="Is this frame overlay?"
+            rules={[{ required: true, message: 'Please select overlay option!' }]}
+          >
+            <Select>
+              <Select.Option value="yes">Yes</Select.Option>
+              <Select.Option value="no">No</Select.Option>
+            </Select>
+          </Form.Item>
 
-    <Form.Item
-      name="vertical_gap"
-      label="Vertical Gap"
-      rules={[{ required: true, message: 'Please enter frame vertical gap!' }]}
-    >
-      <Input />
-    </Form.Item>
+          <Form.Item
+            name="is4by6"
+            label="Is this frame 4 by 6?"
+            rules={[{ required: true, message: 'Please select 4 by 6 option!' }]}
+          >
+            <Select>
+              <Select.Option value="yes">Yes</Select.Option>
+              <Select.Option value="no">No</Select.Option>
+            </Select>
 
-    <Form.Item
-      name="shapes"
-      label="Shapes"
-    >
-      <Input />
-    </Form.Item>
+          </Form.Item>
 
-    <Form.Item
-      name="no_of_photos"
-      label="Number of Photos"
-      rules={[{ required: true, message: 'Please enter number of photos!' }]}
-    >
-      <Input />
-    </Form.Item>
+          <Form.Item
+            name="is2by6"
+            label="Is this frame 2 by 6?"
+            rules={[{
+              required: true, message: 'Please select 2 by 6 option!'
+            }]}
+          >
+            <Select>
+              <Select.Option value="yes">Yes</Select.Option>
+              <Select.Option value="no">No</Select.Option>
+            </Select>
+          </Form.Item>
 
-    {/* Background images display and upload */}
-    <Form.Item
-      name="background"
-      label="Background Images"
-      rules={[{ required: true, message: 'Please provide at least one background image!' }]}
-    >
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-        {editForm.getFieldValue('background')?.split(',').map((url, index) => (
-          url.trim() && (
-            <div key={index} style={{ position: 'relative' }}>
+          <Form.Item
+            name="index"
+            label="Index"
+            rules={[{ required: true, message: 'Please enter frame index!' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="padding"
+            label="Padding"
+            rules={[{ required: true, message: 'Please enter frame padding!' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="topPadding"
+            label="Top Padding"
+            rules={[{ required: true, message: 'Please enter top padding!' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="bottomPadding"
+            label="Bottom Padding"
+            rules={[{ required: true, message: 'Please enter bottom padding!' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="horizontal_gap"
+            label="Horizontal Gap"
+            rules={[{ required: true, message: 'Please enter frame horizontal gap!' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="vertical_gap"
+            label="Vertical Gap"
+            rules={[{ required: true, message: 'Please enter frame vertical gap!' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="shapes"
+            label="Shapes"
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="no_of_photos"
+            label="Number of Photos"
+            rules={[{ required: true, message: 'Please enter number of photos!' }]}
+          >
+            <Input />
+          </Form.Item>
+
+           <Form.Item
+   name="photoSelection"
+   label="Select Photo Option"
+   rules={[{ required: true, message: 'Please select an option!' }]}
+>
+   <Select onChange={(value) => {
+    // Reset all…
+     const newValues = { one: false, two: false, three: false, four: false, five: false, six: false, seven: false };
+     newValues[value] = true;            // e.g. "five"→true
+     // And write into the editForm (not the createForm)
+     editForm.setFieldsValue(newValues);
+   }}>
+     <Select.Option value="one">One</Select.Option>
+     <Select.Option value="two">Two</Select.Option>   
+       <Select.Option value="three">Three</Select.Option>
+    <Select.Option value="four">Four</Select.Option>
+     <Select.Option value="five">Five</Select.Option>
+     <Select.Option value="six">Six</Select.Option>
+     <Select.Option value="seven">Seven</Select.Option>
+   </Select>
+ </Form.Item>
+          {/* Keep these fields hidden as they'll be set programmatically */}
+          <Form.Item name="one" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item name="two" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item name="three" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item name="four" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item name="five" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item name="six" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item name="seven" hidden>
+            <Input />
+          </Form.Item>
+
+
+          {/* Background images display and upload */}
+          <Form.Item
+            name="background"
+            label="Background Images"
+            rules={[{ required: true, message: 'Please provide at least one background image!' }]}
+          >
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+              {editForm.getFieldValue('background')?.split(',').map((url, index) => (
+                url.trim() && (
+                  <div key={index} style={{ position: 'relative' }}>
+                    <Image
+                      src={url.trim()}
+                      style={{ width: 100, height: 100, objectFit: 'cover' }}
+                      preview={{ mask: 'View' }}
+                    />
+                    <Button
+                      type="text"
+                      danger
+                      icon={<MdDelete />}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        right: 0,
+                        color: 'white',
+                        backgroundColor: 'rgba(0,0,0,0.5)'
+                      }}
+                      onClick={() => removeBackgroundImage(index)}
+                    />
+                  </div>
+                )
+              ))}
+            </div>
+          </Form.Item>
+
+          <Form.Item label="Upload Background Image">
+            <input
+              type="file"
+              onChange={handleEditBackgroundFileChange}
+              multiple
+              accept="image/*"
+            />
+          </Form.Item>
+
+          {/* Main frame image */}
+          <Form.Item
+            name="image"
+            label="Image"
+            rules={[{ required: true, message: 'Please provide a frame image!' }]}
+          >
+            {editForm.getFieldValue('image') && (
               <Image
-                src={url.trim()}
-                style={{ width: 100, height: 100, objectFit: 'cover' }}
+                src={editForm.getFieldValue('image')}
+                style={{ width: 100 }}
                 preview={{ mask: 'View' }}
               />
-              <Button
-                type="text"
-                danger
-                icon={<MdDelete />}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  right: 0,
-                  color: 'white',
-                  backgroundColor: 'rgba(0,0,0,0.5)'
-                }}
-                onClick={() => removeBackgroundImage(index)}
+            )}
+          </Form.Item>
+
+          <Form.Item label="Upload Frame Image">
+            <input type="file" onChange={handleEditFileChange} />
+          </Form.Item>
+
+          {/* <Form.Item
+            name="frameImage"
+            label="Frame Image"
+            rules={[{ required: true, message: 'Please provide a frame image!' }]}
+          >
+            {editForm.getFieldValue('frameImage') && (
+              <Image
+                src={editForm.getFieldValue('frameImage')}
+                style={{ width: 100 }}
+                preview={{ mask: 'View' }}
               />
-            </div>
-          )
-        ))}
-      </div>
-    </Form.Item>
+            )}
+          </Form.Item>
 
-    <Form.Item label="Upload Background Image">
-      <input 
-        type="file" 
-        onChange={handleEditBackgroundFileChange} 
-        multiple
-        accept="image/*"
-      />
-    </Form.Item>
+          <Form.Item label="Upload Frame Image">
+            <input type="file" onChange={handleEditFileChange} />
+          </Form.Item> */}
 
-    {/* Main frame image */}
-    <Form.Item
-      name="image"
-      label="Frame Image"
-      rules={[{ required: true, message: 'Please provide a frame image!' }]}
-    >
-      {editForm.getFieldValue('image') && (
-        <Image 
-          src={editForm.getFieldValue('image')} 
-          style={{ width: 100 }} 
-          preview={{ mask: 'View' }}
-        />
-      )}
-    </Form.Item>
 
-    <Form.Item label="Upload Frame Image">
-      <input type="file" onChange={handleEditFileChange} />
-    </Form.Item>
-
-    <Form.Item>
-      <Button type="primary" htmlType="submit">
-        Update Frame
-      </Button>
-    </Form.Item>
-  </Form>
-</Modal>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Update Frame
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
 
       {/* ========== CREATE Frame Modal ========== */}
       <Modal
@@ -785,28 +954,29 @@ const Frame = () => {
 
 
           <Form.Item
-    name="is4by6"
-    label="Is this frame 4 by 6?"
-    rules={[{ required: true, message: 'Please select 4 by 6 option!' }]}
-    >
-      <Select>
-        <Select.Option value="yes">Yes</Select.Option>
-        <Select.Option value="no">No</Select.Option>
-      </Select>
-      
-    </Form.Item>
+            name="is4by6"
+            label="Is this frame 4 by 6?"
+            rules={[{ required: true, message: 'Please select 4 by 6 option!' }]}
+          >
+            <Select>
+              <Select.Option value="yes">Yes</Select.Option>
+              <Select.Option value="no">No</Select.Option>
+            </Select>
 
-    <Form.Item
-    name="is2by6"
-    label="Is this frame 2 by 6?"
-    rules={[{ required: true, message: 'Please select 2 by 6 option!'
-      }]}
-      >
-        <Select>
-          <Select.Option value="yes">Yes</Select.Option>
-          <Select.Option value="no">No</Select.Option>
-        </Select>
-      </Form.Item>
+          </Form.Item>
+
+          <Form.Item
+            name="is2by6"
+            label="Is this frame 2 by 6?"
+            rules={[{
+              required: true, message: 'Please select 2 by 6 option!'
+            }]}
+          >
+            <Select>
+              <Select.Option value="yes">Yes</Select.Option>
+              <Select.Option value="no">No</Select.Option>
+            </Select>
+          </Form.Item>
           <Form.Item
             name="index"
             label="Index"
@@ -824,18 +994,18 @@ const Frame = () => {
           </Form.Item>
 
           <Form.Item
-  name="topPadding"
-  label="Top Padding"
-  rules={[{ required: true, message: 'Please enter top padding!' }]}>
-  <Input />
-</Form.Item>
+            name="topPadding"
+            label="Top Padding"
+            rules={[{ required: true, message: 'Please enter top padding!' }]}>
+            <Input />
+          </Form.Item>
 
-<Form.Item
-  name="bottomPadding"
-  label="Bottom Padding"
-  rules={[{ required: true, message: 'Please enter bottom padding!' }]}>
-  <Input />
-</Form.Item>
+          <Form.Item
+            name="bottomPadding"
+            label="Bottom Padding"
+            rules={[{ required: true, message: 'Please enter bottom padding!' }]}>
+            <Input />
+          </Form.Item>
 
           <Form.Item
             name="horizontal_gap"
@@ -868,8 +1038,59 @@ const Frame = () => {
           >
             <Input />
           </Form.Item>
+          <Form.Item
+            name="photoSelection"
+            label="Select Photo Option"
+            rules={[{ required: true, message: 'Please select an option!' }]}
+          >
+            <Select onChange={(value) => {
+              // Set all options to false first
+              const newValues = {
+                one: false,
+                two: false,
+                three: false,
+                four: false,
+                five: false,
+                six: false,
+                seven: false
+              };
+              // Set the selected option to true
+              newValues[value] = true;
+              editForm.setFieldsValue(newValues);
+            }}>
+              <Select.Option value="one">One</Select.Option>
+              <Select.Option value="two">Two</Select.Option>
+              <Select.Option value="three">Three</Select.Option>
+              <Select.Option value="four">Four</Select.Option>
+              <Select.Option value="five">Five</Select.Option>
+              <Select.Option value="six">Six</Select.Option>
+              <Select.Option value="seven">Seven</Select.Option>
+            </Select>
+          </Form.Item>
 
-          {/* Background as comma separated (array) */}
+          {/* Keep these fields hidden as they'll be set programmatically */}
+          <Form.Item name="one" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item name="two" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item name="three" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item name="four" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item name="five" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item name="six" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item name="seven" hidden>
+            <Input />
+          </Form.Item>
+
           <Form.Item
             name="background"
             label="Background (comma separated URLs)"
@@ -902,7 +1123,6 @@ const Frame = () => {
             />
           </Form.Item>
 
-          {/* Main image */}
           <Form.Item
             name="image"
             label="Frame Image URL"

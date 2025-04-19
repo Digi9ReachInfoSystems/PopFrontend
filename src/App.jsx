@@ -11,6 +11,8 @@ import Login from "./pages/Login/Login";
 import ProtectedRoute from "./../src/utils/ProtectedRoute";
 import Payment from "./pages/Payment/Payment";
 import Coupons from "./pages/Coupons/Coupons";
+import FrameImage from "./pages/FrameImage/FrameImage";
+import PageTimer from "./pages/PageTimer/PageTimer";
 
 function App() {
   return (
@@ -30,6 +32,8 @@ function App() {
             <Route path="frame" element={<Frame />} />
             <Route path="payment" element={<Payment />} />
             <Route path="coupon" element={<Coupons />} />
+            <Route path="frame-image" element={<FrameImage />} />
+            <Route path="pageTimer" element={<PageTimer />} />
           </Route>
         </Route>
 
