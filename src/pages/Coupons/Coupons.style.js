@@ -16,16 +16,17 @@ export const CouponHeader = styled.div`
 `;
 
 export const GenerateButton = styled.button`
-    background-color: #4CAF50;
+    background-color:#2a84fa;
     color: white;
     border: none;
     padding: 10px 15px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
+    font-weight: 500;
 
     &:hover {
-        background-color: #45a049;
+        background-color:#2a84fa;
     }
 `;
 

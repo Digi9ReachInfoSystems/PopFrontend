@@ -11,7 +11,9 @@ import { generateCoupon, getAllCoupons, deleteCoupon } from '../../api/couponApi
 import { getAllFrames } from '../../api/frameApi';
 import { getCopies } from '../../api/copiesApi';
 import Modal from 'react-modal';
-import { Table, Button, Input, Select, Modal as AntdModal, message } from 'antd';
+// import { Table, Button, Input, Select, Modal as AntdModal, message } from 'antd';
+import { Table, Button, Input, Select, Modal as AntdModal, message, Popconfirm } from 'antd';
+
 import { DeleteOutlined } from '@ant-design/icons';
 
 Modal.setAppElement('#root');
@@ -209,14 +211,19 @@ const Coupons = () => {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
-        <Button
-          danger
-          icon={<DeleteOutlined />}
-          onClick={() => handleDeleteCoupon(record._id)}
-          loading={loading.deleting}
+        <Popconfirm
+          title="Are you sure you want to delete this coupon?"
+          onConfirm={() => handleDeleteCoupon(record._id)}
+          okText="Yes"
+          cancelText="No"
         >
-          Delete
-        </Button>
+          <Button
+            danger
+            icon={<DeleteOutlined />}
+            loading={loading.deleting}
+            style={{ border: 'none' }}
+          />
+        </Popconfirm>
       )
     }
   ];

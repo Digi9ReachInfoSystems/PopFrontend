@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Spin, Alert, Input, Modal } from 'antd';
+import { Table, Spin, Alert, Input, Modal, Typography } from 'antd';
 import { UsersWrapper, UsersContent } from './Users.style';
 import { getAllUsers } from '../../api/userApi';
-
+const { Title }= Typography;
 const Users = () => {
     const [users, setUsers] = useState([]);  
     const [loading, setLoading] = useState(false);
@@ -134,7 +134,18 @@ const Users = () => {
 
     return (
         <UsersWrapper>
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        marginBottom: '16px' 
+      }}>
+        <Title level={2} style={{ 
+          fontSize: '1.5rem', 
+          margin: 20 
+        }}>
+          Users
+        </Title>   
                 <Input
                     placeholder="Search by username"
                     value={searchText}
